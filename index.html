@@ -1,78 +1,519 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh">
 <head>
-<meta charset="UTF-8">
-<title>Review</title>
-<style>
-body{font-family:Arial;padding:20px;background:#f5f5f5}
-.card{background:white;padding:15px;margin:10px;border-radius:12px}
-button{margin:5px;padding:8px 12px;border-radius:8px;border:none}
-.good{background:#9be7a1}
-.ok{background:#ffe08a}
-.bad{background:#ff9e9e}
-.easy{background:#8ad4ff}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Ebbinghaus Review</title>
+  <style>
+    :root{
+      --bg:#0b0f19;
+      --card:rgba(255,255,255,.08);
+      --card2:rgba(255,255,255,.06);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.62);
+      --line:rgba(255,255,255,.12);
+      --shadow: 0 20px 60px rgba(0,0,0,.45);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background: radial-gradient(1200px 700px at 10% 0%, #1b2a6a 0%, transparent 55%),
+                  radial-gradient(1000px 650px at 90% 10%, #6a1b5c 0%, transparent 60%),
+                  radial-gradient(900px 700px at 50% 100%, #0c3b3b 0%, transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Display","SF Pro Text", Arial, "PingFang SC","Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      display:flex;
+      justify-content:center;
+      padding:24px 16px 40px;
+    }
+    .wrap{width:min(920px, 100%)}
+    .title{
+      font-size:28px;
+      letter-spacing:.2px;
+      margin:6px 0 14px;
+      display:flex;
+      align-items:baseline;
+      gap:10px;
+    }
+    .title small{color:var(--muted); font-size:14px; font-weight:500}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:16px;
+    }
+    @media (max-width: 880px){
+      .grid{grid-template-columns: 1fr; }
+    }
+
+    .panel{
+      background:linear-gradient(180deg, var(--card), var(--card2));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panelHead{
+      padding:14px 16px;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .panelHead b{font-size:15px}
+    .panelHead span{color:var(--muted); font-size:12px}
+
+    .content{padding:16px}
+
+    .formRow{
+      display:grid;
+      grid-template-columns: 1fr 160px 120px;
+      gap:10px;
+      align-items:center;
+    }
+    @media (max-width: 520px){
+      .formRow{grid-template-columns:1fr; }
+    }
+    input{
+      width:100%;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.25);
+      color:var(--text);
+      outline:none;
+      font-size:14px;
+    }
+    input::placeholder{color:rgba(255,255,255,.45)}
+    .btn{
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.18);
+      background: rgba(255,255,255,.10);
+      color:var(--text);
+      font-weight:650;
+      letter-spacing:.2px;
+      cursor:pointer;
+      user-select:none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:active{transform: translateY(1px)}
+    .btnPrimary{
+      background: linear-gradient(135deg, rgba(138,212,255,.35), rgba(155,231,161,.22));
+      border:1px solid rgba(255,255,255,.22);
+    }
+    .btnGhost{
+      background: transparent;
+      border:1px solid rgba(255,255,255,.16);
+      color: var(--muted);
+      font-weight:600;
+    }
+
+    /* Scroll list under the Add row */
+    .listBox{
+      margin-top:12px;
+      border:1px solid rgba(255,255,255,.14);
+      border-radius: 16px;
+      background: rgba(0,0,0,.22);
+      overflow:hidden;
+    }
+    .listHeader{
+      display:grid;
+      grid-template-columns: 1.1fr .7fr .7fr .45fr;
+      gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      font-size:12px;
+    }
+    .scroll{
+      max-height: 220px;
+      overflow:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 1.1fr .7fr .7fr .45fr;
+      gap:10px;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      align-items:center;
+      font-size:13px;
+    }
+    .row:last-child{border-bottom:none}
+    .name{font-weight:650}
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--muted);
+      font-size:12px;
+      justify-content:center;
+      white-space:nowrap;
+    }
+    .rowActions{
+      display:flex;
+      justify-content:flex-end;
+      gap:8px;
+    }
+    .iconBtn{
+      padding:7px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      cursor:pointer;
+      font-size:12px;
+    }
+
+    /* Today due cards */
+    .dueCard{
+      padding:14px 14px 12px;
+      border-radius: 18px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      margin-bottom:12px;
+    }
+    .dueTop{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      align-items:flex-start;
+      margin-bottom:10px;
+    }
+    .dueTop .meta{color:var(--muted); font-size:12px}
+    .dueTop .big{font-size:16px; font-weight:750}
+    .gradeRow{display:flex; flex-wrap:wrap; gap:10px}
+    .gbtn{
+      flex:1;
+      min-width: 120px;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.08);
+      color:var(--text);
+      font-weight:700;
+      cursor:pointer;
+    }
+    .g0{background: rgba(255,158,158,.16)}
+    .g1{background: rgba(255,224,138,.14)}
+    .g2{background: rgba(155,231,161,.14)}
+    .g3{background: rgba(138,212,255,.14)}
+
+    .hint{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.6;
+      margin-top:10px;
+    }
+    .empty{
+      color:var(--muted);
+      padding:14px;
+      border:1px dashed rgba(255,255,255,.18);
+      border-radius: 16px;
+      background: rgba(0,0,0,.18);
+    }
+    .footerRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+  </style>
 </head>
-
 <body>
+  <div class="wrap">
+    <div class="title">
+      Ebbinghaus Review
+      <small>Day 0 / 1 / 2 / 3 / 5 / 7 / 10 / 15 / 30 · 本地保存</small>
+    </div>
 
-<h2>Review Planner</h2>
+    <div class="grid">
+      <!-- Left: add + list -->
+      <div class="panel">
+        <div class="panelHead">
+          <b>添加项目</b>
+          <span>输入名称与开始日期（Day0）</span>
+        </div>
+        <div class="content">
+          <div class="formRow">
+            <input id="name" placeholder="项目名（例如：Economics U2 definitions）" />
+            <input type="date" id="date" />
+            <button class="btn btnPrimary" id="addBtn">Add</button>
+          </div>
 
-<input id="name" placeholder="Project">
-<input type="date" id="date">
-<button onclick="add()">Add</button>
+          <div class="listBox" aria-label="All items">
+            <div class="listHeader">
+              <div>名字</div>
+              <div>开始</div>
+              <div>下次复习</div>
+              <div style="text-align:right;">操作</div>
+            </div>
+            <div class="scroll" id="allList"></div>
+          </div>
 
-<h3>Today's Reviews</h3>
-<div id="today"></div>
+          <div class="footerRow">
+            <button class="btn btnGhost" id="exportBtn">Export JSON</button>
+            <button class="btn btnGhost" id="importBtn">Import JSON</button>
+            <button class="btn btnGhost" id="resetBtn">清空全部</button>
+          </div>
+
+          <div class="hint">
+            评分逻辑（简化版）：不会→回到 Day0；模糊/会/简单→推进到下一阶段（最多到 Day30）。<br>
+            数据保存在本机浏览器 localStorage（同一设备同一浏览器会一直在）。
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: today's reviews -->
+      <div class="panel">
+        <div class="panelHead">
+          <b>Today</b>
+          <span id="todayLabel">—</span>
+        </div>
+        <div class="content" id="today"></div>
+      </div>
+    </div>
+  </div>
 
 <script>
-let schedule=[0,1,2,3,5,7,10,15,30]
-let data=JSON.parse(localStorage.getItem("rev")||"[]")
+  const SCHEDULE = [0,1,2,3,5,7,10,15,30];
 
-function add(){
-let name=document.getElementById("name").value
-let date=document.getElementById("date").value
-data.push({name:name,start:date,stage:0})
-save()
-render()
-}
+  function isoTodayLocal(){
+    // avoid UTC mismatch on iPad
+    const d = new Date();
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
 
-function save(){
-localStorage.setItem("rev",JSON.stringify(data))
-}
+  function addDays(dateStr, days){
+    const d = new Date(dateStr + "T00:00:00");
+    d.setDate(d.getDate() + days);
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
 
-function render(){
-let t=new Date().toISOString().slice(0,10)
-let div=document.getElementById("today")
-div.innerHTML=""
+  function escapeHtml(s){
+    return (s||"").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+    }[c]));
+  }
 
-data.forEach((x,i)=>{
-let d=new Date(x.start)
-d.setDate(d.getDate()+schedule[x.stage])
-let due=d.toISOString().slice(0,10)
+  function load(){
+    try{
+      return JSON.parse(localStorage.getItem("eb_rev") || "[]");
+    }catch(e){
+      return [];
+    }
+  }
+  function save(data){
+    localStorage.setItem("eb_rev", JSON.stringify(data));
+  }
 
-if(due==t){
-div.innerHTML+=`
-<div class="card">
-<b>${x.name}</b><br>
-<button class="bad" onclick="rate(${i},0)">不会</button>
-<button class="ok" onclick="rate(${i},1)">模糊</button>
-<button class="good" onclick="rate(${i},2)">会</button>
-<button class="easy" onclick="rate(${i},3)">简单</button>
-</div>`
-}
-})
-}
+  function nextDue(item){
+    const stage = Math.max(0, Math.min(item.stage||0, SCHEDULE.length-1));
+    return addDays(item.start, SCHEDULE[stage]);
+  }
 
-function rate(i,type){
-if(type==0)data[i].stage=0
-else data[i].stage++
-save()
-render()
-}
+  function stagePill(stage){
+    const s = Math.max(0, Math.min(stage||0, SCHEDULE.length-1));
+    return `Day${SCHEDULE[s]}`;
+  }
 
-render()
+  function render(){
+    const data = load();
+    const today = isoTodayLocal();
+    document.getElementById("todayLabel").textContent = today;
+
+    // Today list
+    const todayDiv = document.getElementById("today");
+    todayDiv.innerHTML = "";
+    const dueToday = data
+      .map((it, idx)=>({it, idx, due: nextDue(it)}))
+      .filter(x => x.due === today)
+      .sort((a,b)=>a.it.name.localeCompare(b.it.name));
+
+    if(dueToday.length === 0){
+      todayDiv.innerHTML = `<div class="empty">今天没有到期复习 ✅</div>`;
+    }else{
+      dueToday.forEach(({it, idx, due})=>{
+        todayDiv.insertAdjacentHTML("beforeend", `
+          <div class="dueCard">
+            <div class="dueTop">
+              <div>
+                <div class="big">${escapeHtml(it.name)}</div>
+                <div class="meta">开始：${escapeHtml(it.start)} · 当前：${stagePill(it.stage)}</div>
+              </div>
+              <div class="pill">到期：${escapeHtml(due)}</div>
+            </div>
+            <div class="gradeRow">
+              <button class="gbtn g0" data-i="${idx}" data-t="0">不会</button>
+              <button class="gbtn g1" data-i="${idx}" data-t="1">模糊</button>
+              <button class="gbtn g2" data-i="${idx}" data-t="2">会</button>
+              <button class="gbtn g3" data-i="${idx}" data-t="3">简单</button>
+            </div>
+          </div>
+        `);
+      });
+    }
+
+    // All list (scroll box)
+    const all = document.getElementById("allList");
+    if(data.length === 0){
+      all.innerHTML = `<div class="row"><div class="name" style="color:rgba(255,255,255,.55)">（暂无项目）</div><div>-</div><div>-</div><div></div></div>`;
+    }else{
+      const rows = data
+        .map((it, idx)=>({it, idx, due: nextDue(it)}))
+        .sort((a,b)=>a.due.localeCompare(b.due));
+      all.innerHTML = rows.map(({it, idx, due})=>`
+        <div class="row">
+          <div class="name">${escapeHtml(it.name)} <span class="pill" style="margin-left:8px">${stagePill(it.stage)}</span></div>
+          <div>${escapeHtml(it.start)}</div>
+          <div>${escapeHtml(due)}</div>
+          <div class="rowActions">
+            <button class="iconBtn" data-del="${idx}">删除</button>
+          </div>
+        </div>
+      `).join("");
+    }
+  }
+
+  function addItem(){
+    const nameEl = document.getElementById("name");
+    const dateEl = document.getElementById("date");
+    const name = (nameEl.value || "").trim();
+    const start = dateEl.value;
+
+    if(!name){
+      nameEl.focus();
+      return;
+    }
+    if(!start){
+      // default to today
+      dateEl.value = isoTodayLocal();
+    }
+    const finalStart = dateEl.value;
+
+    const data = load();
+    data.push({
+      name,
+      start: finalStart,
+      stage: 0,
+      createdAt: Date.now()
+    });
+    save(data);
+
+    nameEl.value = "";
+    nameEl.focus();
+    render();
+  }
+
+  function rateItem(index, type){
+    const data = load();
+    const it = data[index];
+    if(!it) return;
+
+    if(Number(type) === 0){
+      it.stage = 0;
+    }else{
+      it.stage = Math.min((it.stage||0) + 1, SCHEDULE.length-1);
+    }
+    save(data);
+    render();
+  }
+
+  function deleteItem(index){
+    const data = load();
+    if(index<0 || index>=data.length) return;
+    data.splice(index,1);
+    save(data);
+    render();
+  }
+
+  function resetAll(){
+    localStorage.removeItem("eb_rev");
+    render();
+  }
+
+  function exportJSON(){
+    const data = load();
+    const blob = new Blob([JSON.stringify(data,null,2)], {type:"application/json"});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "ebbinghaus-review.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function importJSON(){
+    const inp = document.createElement("input");
+    inp.type = "file";
+    inp.accept = "application/json";
+    inp.onchange = (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        try{
+          const parsed = JSON.parse(String(reader.result||"[]"));
+          if(!Array.isArray(parsed)) return;
+          // minimal validation
+          const cleaned = parsed.map(x=>({
+            name: String(x.name||"").trim() || "Untitled",
+            start: String(x.start||isoTodayLocal()),
+            stage: Math.max(0, Math.min(Number(x.stage||0), SCHEDULE.length-1)),
+            createdAt: Number(x.createdAt||Date.now())
+          }));
+          save(cleaned);
+          render();
+        }catch(err){}
+      };
+      reader.readAsText(file);
+    };
+    inp.click();
+  }
+
+  // Wire up events (fixes iPad click issues)
+  document.getElementById("addBtn").addEventListener("click", addItem);
+  document.getElementById("name").addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") addItem();
+  });
+
+  document.addEventListener("click", (e)=>{
+    const t = e.target;
+
+    // grade buttons
+    if(t && t.matches(".gbtn")){
+      rateItem(Number(t.dataset.i), Number(t.dataset.t));
+    }
+    // delete buttons
+    if(t && t.matches("[data-del]")){
+      deleteItem(Number(t.dataset.del));
+    }
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", resetAll);
+  document.getElementById("exportBtn").addEventListener("click", exportJSON);
+  document.getElementById("importBtn").addEventListener("click", importJSON);
+
+  // set date default
+  document.getElementById("date").value = isoTodayLocal();
+
+  render();
 </script>
-
 </body>
 </html>
